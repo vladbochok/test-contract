@@ -11,7 +11,7 @@ IL2Messanger constant L2_MESSANGER = IL2Messanger(address(SYSTEM_CONTRACTS_OFFSE
 
 library Helper {
     function sendMessageToL1(bytes memory _message) internal returns (bytes32) {
-        // return L2_MESSANGER.sendToL1(_message);
+        return L2_MESSANGER.sendToL1(_message);
     }
 
 }

@@ -5,11 +5,22 @@ pragma solidity ^0.8.0;
 import "./Helper.sol";
 import "./ReentrancyGuard.sol";
 import "./HeapLibrary.sol";
-import "./ITest.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @author Matter Labs
-contract Test is ReentrancyGuard, ITest {
+contract Main is ReentrancyGuard {
+    event ContractCreated(address indexed contractAddress, address indexed creatorAddress);
+
+    event ERC20Deployed(address indexed tokenAddress, string name, string symbol, uint8 decimals, uint256 indexed id);
+
+    event HeapUpdated(bytes indexed data, uint256);
+
+    struct SignatureTestData {
+        bytes32 hash;
+        bytes signature;
+        address addr;
+    }
+
     using HeapLibrary for HeapLibrary.Heap;
 
     address public creator;
@@ -124,7 +135,7 @@ contract Test is ReentrancyGuard, ITest {
         id += 1;
     }
 
-    function ecrecoverTest() public  {
+    function ecrecoverTest() public pure {
         // success recovering address
 
         SignatureTestData memory data1 = SignatureTestData({
@@ -153,7 +164,7 @@ contract Test is ReentrancyGuard, ITest {
         _ecrecoverOneTest(data4);
     }
 
-    function _ecrecoverOneTest(SignatureTestData memory _data) internal {
+    function _ecrecoverOneTest(SignatureTestData memory _data) internal pure {
         bytes memory signature = _data.signature;
 		require(signature.length == 65);
 		uint8 v;
