@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "./Helper.sol";
 import "./ReentrancyGuard.sol";
 import "./HeapLibrary.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @author Matter Labs
 contract Main is ReentrancyGuard {
@@ -29,16 +29,7 @@ contract Main is ReentrancyGuard {
     uint256 public lastPulledBlockNumber;
     HeapLibrary.Heap heap;
 
-    address public immutable self;
-    
-    constructor() {
-        assert(address(this) != address(0));
-        self = address(this);
-        creator = msg.sender;
-        initializeReentrancyGuard();
-    }
-
-    function heavyTest() external nonReentrant {
+    fallback() external nonReentrant {
         // Make common checks before processing the function
         commonChecks();
 
@@ -62,20 +53,13 @@ contract Main is ReentrancyGuard {
 
         }
 
-        // Test deploy
-        deployERC20Test();
-
-        // Test deploy contract in external mode
-        this.deployERC20Test();
-
         // Test a couple of ercecover calls.
         ecrecoverTest();
     }
 
     function commonChecks() public {
-        require(tx.origin == msg.sender);
-        require(msg.data.length != 0);
-        assert(address(this) == self);
+        // require(tx.origin == msg.sender);
+        require(msg.data.length == 0);
         
         lastCalledFunction = msg.sig;
         lastPulledBlockNumber = block.number;
@@ -85,19 +69,15 @@ contract Main is ReentrancyGuard {
         uint256 gasLeftBefore = gasleft();
 
         bytes memory data = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard...";
-        for(uint256 i=0;i<9; i++) {
+        for(uint256 i=0;i<4; i++) {
             bytes32 weirdHash = keccak256(data) ^ sha256(data);
             data = bytes.concat(data, weirdHash);
             heap.push(uint256(weirdHash));
             
-            if (i%3 == 0) {
-                Helper.sendMessageToL1(data);
-            }
+            Helper.sendMessageToL1(data);
         }
 
-        for(uint256 i=0;i<5; i++) {
-            heap.pop();
-        }
+        heap.pop();
 
         uint256 gasLeftAfter = gasleft();
 
@@ -123,16 +103,6 @@ contract Main is ReentrancyGuard {
         Helper.sendMessageToL1(data);
 
         revert();
-    }
-
-    function deployERC20Test() public {
-        string memory name = "testnet token";
-        string memory symbol = "symbol";
-        ERC20 token = new ERC20("testnet token", "symbol");
-        emit ERC20Deployed(address(token), name, symbol, 18, id);
-        bytes memory data = abi.encode(name, symbol, 18, id);
-        Helper.sendMessageToL1(data);
-        id += 1;
     }
 
     function ecrecoverTest() public pure {
