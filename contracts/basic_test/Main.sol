@@ -26,7 +26,14 @@ contract Main is ReentrancyGuard {
     address public creator;
     uint256 public id;
     bytes4 public lastCalledFunction;
+    uint256 public lastTimestamp;
+    address public lastTxOrigin;
     uint256 public lastPulledBlockNumber;
+    uint256 public savedChainId;
+    uint256 public savedGasPrice;
+    uint256 public savedBlockGasLimit;
+    address public savedCoinbase;
+    uint256 public savedDifficulty; 
     HeapLibrary.Heap heap;
 
     fallback() external nonReentrant {
@@ -61,6 +68,19 @@ contract Main is ReentrancyGuard {
         // require(tx.origin == msg.sender);
         require(msg.data.length == 0);
         
+
+        if (block.number > 0) {
+            blockhash(block.number - 1);
+            blockhash(block.number + 1000);
+        }
+
+        savedDifficulty = block.difficulty;
+        savedCoinbase = block.coinbase;
+        savedBlockGasLimit = block.gaslimit;
+        savedGasPrice = tx.gasprice;
+        savedChainId = block.chainid;
+        lastTimestamp = block.timestamp;
+        lastTxOrigin = tx.origin;
         lastCalledFunction = msg.sig;
         lastPulledBlockNumber = block.number;
     }
