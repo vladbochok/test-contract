@@ -34,6 +34,7 @@ contract Main is ReentrancyGuard {
     uint256 public savedBlockGasLimit;
     address public savedCoinbase;
     uint256 public savedDifficulty; 
+    uint256 public lastPulledMsgValue;
     HeapLibrary.Heap heap;
 
     fallback() external nonReentrant {
@@ -83,6 +84,7 @@ contract Main is ReentrancyGuard {
         lastTxOrigin = tx.origin;
         lastCalledFunction = msg.sig;
         lastPulledBlockNumber = block.number;
+        lastPulledMsgValue = msg.value;
     }
 
     function heapTest() public {
