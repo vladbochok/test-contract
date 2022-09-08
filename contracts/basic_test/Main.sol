@@ -37,7 +37,7 @@ contract Main is ReentrancyGuard {
     uint256 public lastPulledMsgValue;
     HeapLibrary.Heap heap;
 
-    fallback() external nonReentrant {
+    receive() external payable nonReentrant {
         // Make common checks before processing the function
         commonChecks();
 
@@ -65,7 +65,7 @@ contract Main is ReentrancyGuard {
         ecrecoverTest();
     }
 
-    function commonChecks() public {
+    function commonChecks() public payable {
         // require(tx.origin == msg.sender);
         require(msg.data.length == 0);
         
