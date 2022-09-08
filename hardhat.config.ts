@@ -1,4 +1,3 @@
-import '@nomiclabs/hardhat-solpp';
 import '@typechain/hardhat';
 
 export default {
