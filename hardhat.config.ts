@@ -1,13 +1,18 @@
 import '@typechain/hardhat';
+import '@matterlabs/hardhat-zksync-solc';
 
 export default {
     zksolc: {
         version: '0.1.0',
-        compilerSource: 'binary',
+        compilerSource: 'docker',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 200
+            },
+            experimental: {
+                dockerImage: 'matterlabs/zksolc',
+                tag: 'beta'
             }
         }
     },
