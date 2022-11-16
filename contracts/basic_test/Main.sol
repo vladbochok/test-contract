@@ -37,6 +37,15 @@ contract Main is ReentrancyGuard {
     uint256 public lastPulledMsgValue;
     HeapLibrary.Heap heap;
 
+    constructor() {
+        require(address(this).code.length == 0);
+        require(address(this).codehash == keccak256(""));
+
+        (bool success, bytes memory data) = address(this).call(abi.encodeCall(Main.getter, ()));
+        require(success);
+        require(data.length == 0);
+    }
+
     receive() external payable nonReentrant {
         // Make common checks before processing the function
         commonChecks();
@@ -106,6 +115,10 @@ contract Main is ReentrancyGuard {
         require(gasLeftAfter < gasLeftBefore, "Some error message");
 
         emit HeapUpdated(data, gasLeftBefore - gasLeftAfter);
+    }
+
+    function getter() external pure returns(bytes4) {
+        return this.getter.selector;
     }
 
     // Should fails
