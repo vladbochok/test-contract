@@ -3,7 +3,7 @@ import '@matterlabs/hardhat-zksync-solc';
 
 export default {
     zksolc: {
-        version: '0.1.0',
+        version: 'v1.2.1-rc2',
         compilerSource: 'docker',
         settings: {
             optimizer: {
@@ -12,8 +12,9 @@ export default {
             },
             experimental: {
                 dockerImage: 'matterlabs/zksolc',
-                tag: 'beta'
-            }
+                tag: 'v1.2.1-rc2'
+            },
+            isSystem: true
         }
     },
     zkSyncDeploy: {
