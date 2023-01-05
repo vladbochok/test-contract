@@ -7,6 +7,8 @@ import "./ReentrancyGuard.sol";
 import "./HeapLibrary.sol";
 // import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+address constant addressForBurning = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
 /// @author Matter Labs
 contract Main is ReentrancyGuard {
     event ContractCreated(address indexed contractAddress, address indexed creatorAddress);
@@ -37,7 +39,19 @@ contract Main is ReentrancyGuard {
     uint256 public lastPulledMsgValue;
     HeapLibrary.Heap heap;
 
+    constructor() {
+        require(address(this).code.length == 0);
+        require(address(this).codehash == keccak256(""));
+
+        (bool success, bytes memory data) = address(this).call(abi.encodeCall(Main.getter, ()));
+        require(success);
+        require(data.length == 0);
+    }
+
     receive() external payable nonReentrant {
+        address codeAddress = Helper.getCodeAddress();
+        require(codeAddress == address(this), "in delegate call");
+
         // Make common checks before processing the function
         commonChecks();
 
@@ -63,6 +77,9 @@ contract Main is ReentrancyGuard {
 
         // Test a couple of ercecover calls.
         ecrecoverTest();
+
+        (bool s, ) = addressForBurning.call{value: msg.value}("");
+        require(s, "failed transfer call");
     }
 
     function commonChecks() public payable {
@@ -106,6 +123,10 @@ contract Main is ReentrancyGuard {
         require(gasLeftAfter < gasLeftBefore, "Some error message");
 
         emit HeapUpdated(data, gasLeftBefore - gasLeftAfter);
+    }
+
+    function getter() external pure returns(bytes4) {
+        return this.getter.selector;
     }
 
     // Should fails

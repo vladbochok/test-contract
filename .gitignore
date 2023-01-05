@@ -1,6 +1,8 @@
 node_modules
 cache
 artifacts
+artifacts-zk
+cache-zk
 typechain-types
 build
 yarn-debug.log*
