@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": {
-    "@matterlabs/hardhat-zksync-solc": "^0.3.9",
+    "@matterlabs/hardhat-zksync-solc": "^0.3.12",
     "@typechain/hardhat": "^6.0.0",
     "ethers": "^5.6.6",
     "hardhat": "^2.9.5",
