@@ -3,17 +3,14 @@ import '@matterlabs/hardhat-zksync-solc';
 
 export default {
     zksolc: {
-        version: 'v1.2.1-rc2',
-        compilerSource: 'docker',
+        version: 'v1.3243242',
+        compilerSource: 'binary',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 200
             },
-            experimental: {
-                dockerImage: 'matterlabs/zksolc',
-                tag: 'v1.2.1-rc2'
-            },
+            compilerPath: "/Users/vlad/Desktop/Work/system-contracts/zksolc/zksolc_dev-vm1.3_only_for_tests",
             isSystem: true
         }
     },
@@ -22,7 +19,7 @@ export default {
         ethNetwork: 'goerli'
     },
     solidity: {
-        version: '0.8.8'
+        version: '0.8.17'
     },
     paths: {
         sources: './contracts'
