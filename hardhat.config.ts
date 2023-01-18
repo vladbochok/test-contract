@@ -3,14 +3,14 @@ import '@matterlabs/hardhat-zksync-solc';
 
 export default {
     zksolc: {
-        version: 'v1.3243242',
+        version: 'v1.32432421',
         compilerSource: 'binary',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 200
             },
-            compilerPath: "/Users/vlad/Desktop/Work/system-contracts/zksolc/zksolc_dev-vm1.3_only_for_tests",
+            compilerPath: "/Users/vlad/Desktop/Work/system-contracts/zksolc-dev1.3-cpr-848",
             isSystem: true
         }
     },
