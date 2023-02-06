@@ -1,16 +1,34 @@
+import { HardhatUserConfig } from "hardhat/config";
 import '@typechain/hardhat';
 import '@matterlabs/hardhat-zksync-solc';
+import "@matterlabs/hardhat-zksync-deploy";
+import "@nomiclabs/hardhat-ethers";
+
+// dynamically changes endpoints for local tests
+const zkSyncTestnet =
+  process.env.NODE_ENV == "test"
+    ? {
+        url: "http://localhost:3050",
+        ethNetwork: "http://localhost:8545",
+        zksync: true,
+      }
+    : {
+        url: "https://zksync2-testnet.zksync.dev",
+        ethNetwork: "goerli",
+        zksync: true,
+      };
+
 
 export default {
+    defaultNetwork:  "zkSyncTestnet",
     zksolc: {
-        version: 'v1.32432421',
+        version: '1.3.0',
         compilerSource: 'binary',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 200
             },
-            compilerPath: "/Users/vlad/Desktop/Work/system-contracts/zksolc-dev1.3-cpr-848",
             isSystem: true
         }
     },
@@ -27,6 +45,7 @@ export default {
     networks: {
         hardhat: {
             zksync: true
-        }
+        },
+        zkSyncTestnet,
     }
 };
