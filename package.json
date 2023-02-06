@@ -3,23 +3,31 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": {
+    "@matterlabs/hardhat-zksync-chai-matchers": "^0.1.0",
+    "@matterlabs/hardhat-zksync-deploy": "^0.6.1",
     "@matterlabs/hardhat-zksync-solc": "^0.3.12",
     "@typechain/hardhat": "^6.0.0",
     "ethers": "^5.6.6",
     "hardhat": "^2.9.5",
-    "openzeppelin-contracts": "^4.0.0"
+    "openzeppelin-contracts": "^4.0.0",
+    "zksync-web3": "^0.13.0-beta.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@typechain/ethers-v5": "^10.0.0",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^10.0.34",
+    "chai": "^4.3.7",
     "fs": "^0.0.1-security",
+    "mocha": "^10.2.0",
     "ts-generator": "^0.1.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.0.0",
     "typescript": "^4.3.5"
   },
   "scripts": {
-    "build": "hardhat compile && ts-node src/generateTestArtifacts.ts"
+    "build": "hardhat compile && ts-node src/generateTestArtifacts.ts",
+    "test": "NODE_ENV=test hardhat test"
   }
 }
