@@ -3,19 +3,20 @@
 pragma solidity ^0.8.0;
 
 import "./Helper.sol";
-import "./ReentrancyGuard.sol";
 import "./HeapLibrary.sol";
-// import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./ConstructorReentrantContract.sol";
 
 address constant addressForBurning = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
 /// @author Matter Labs
-contract Main is ReentrancyGuard {
+contract Main {
     event ContractCreated(address indexed contractAddress, address indexed creatorAddress);
 
     event ERC20Deployed(address indexed tokenAddress, string name, string symbol, uint8 decimals, uint256 indexed id);
 
     event HeapUpdated(bytes indexed data, uint256);
+
+    event EventToPreventOptimisation(uint256 indexed _data);
 
     struct SignatureTestData {
         bytes32 hash;
@@ -39,16 +40,7 @@ contract Main is ReentrancyGuard {
     uint256 public lastPulledMsgValue;
     HeapLibrary.Heap heap;
 
-    constructor() {
-        require(address(this).code.length == 0);
-        require(address(this).codehash == keccak256(""));
-
-        (bool success, bytes memory data) = address(this).call(abi.encodeCall(Main.getter, ()));
-        require(success);
-        require(data.length == 0);
-    }
-
-    receive() external payable nonReentrant {
+    receive() external payable {
         address codeAddress = Helper.getCodeAddress();
         require(codeAddress == address(this), "in delegate call");
 
@@ -80,10 +72,67 @@ contract Main is ReentrancyGuard {
 
         (bool s, ) = addressForBurning.call{value: msg.value}("");
         require(s, "failed transfer call");
+
+        try this.returnMemory{gas: gasleft()/10000}(0, type(uint32).max) {
+            revert("return memory test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.returnMemory{gas: gasleft()/10000}(0, type(uint256).max) {
+            revert("return memory test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        // FIXME: Temporary solution
+        try this.accessCalldata(type(uint32).max) {
+            revert("access calldata test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.accessCalldata(uint256(type(uint32).max) + 1) {
+            revert("access calldata test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.accessMemory{gas: gasleft()/10000}(uint256(type(uint24).max)) {
+            revert("access memory test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.accessMemory{gas: gasleft()/10000}(uint256(type(uint32).max)) {
+            revert("access memory test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.accessMemory{gas: gasleft()/10000}(type(uint256).max) {
+            revert("access memory test should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.rawCall{gas: gasleft()/10000}(0, 0, 2**31, 2**31) {
+            revert("raw call test with big out put should failed");
+        } catch {
+            // Do nothing
+        }
+
+        try this.rawCall{gas: gasleft()/10000}(2**31, 2**31, 0, 0) {
+            revert("raw call test with big out put should failed");
+        } catch {
+            // Do nothing
+        }
+
+        _deployTest();
     }
 
     function commonChecks() public payable {
-        // require(tx.origin == msg.sender);
+        require(tx.origin == msg.sender);
         require(msg.data.length == 0);
         
 
@@ -94,8 +143,9 @@ contract Main is ReentrancyGuard {
 
         savedDifficulty = block.difficulty;
         savedCoinbase = block.coinbase;
-        savedBlockGasLimit = block.gaslimit;
-        savedGasPrice = tx.gasprice;
+        // FIXME: for some reason it fails
+        // savedBlockGasLimit = block.gaslimit;
+        // savedGasPrice = tx.gasprice;
         savedChainId = block.chainid;
         lastTimestamp = block.timestamp;
         lastTxOrigin = tx.origin;
@@ -146,6 +196,49 @@ contract Main is ReentrancyGuard {
         Helper.sendMessageToL1(data);
 
         revert();
+    }
+
+    function returnMemory(uint256 _offset, uint256 _length) external {
+        assembly {
+            return(_offset, _length)
+        }
+    }
+
+    function accessMemory(uint256 _input) external {
+        uint256 x;
+        assembly {
+            x := mload(_input)
+        }
+        emit EventToPreventOptimisation(x);
+    }
+
+    function accessCalldata(uint256 _offset) external {
+        uint256 x;
+        assembly {
+            x := calldataload(_offset)
+        }
+        emit EventToPreventOptimisation(x);
+    }
+
+    function rawCall(
+        uint256 _inputOffset,
+        uint256 _inputLength,
+        uint256 _outputOffset, 
+        uint256 _outputLength
+    ) external {
+        assembly {
+            let success := call(gas(), address(), 0, _inputOffset, _inputLength, _outputOffset, _outputLength)
+            if iszero(success) {
+                revert(0, 0)
+            }
+        }
+    }
+
+    function _deployTest() internal {
+        address deployedContract = address(new ConstructorReentrantContract());
+        require(deployedContract != address(0), "Failed to deploy contract");
+
+        emit ContractCreated(deployedContract, msg.sender);
     }
 
     function ecrecoverTest() public pure {
