@@ -143,9 +143,8 @@ contract Main {
 
         savedDifficulty = block.difficulty;
         savedCoinbase = block.coinbase;
-        // FIXME: for some reason it fails
-        // savedBlockGasLimit = block.gaslimit;
-        // savedGasPrice = tx.gasprice;
+        savedBlockGasLimit = block.gaslimit;
+        savedGasPrice = tx.gasprice;
         savedChainId = block.chainid;
         lastTimestamp = block.timestamp;
         lastTxOrigin = tx.origin;
