@@ -10,7 +10,7 @@
     "ethers": "^5.6.6",
     "hardhat": "^2.9.5",
     "openzeppelin-contracts": "^4.0.0",
-    "zksync-web3": "^0.13.0-beta.0"
+    "zksync-web3": "^0.13.0-beta.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "hardhat compile && ts-node src/generateTestArtifacts.ts",
+    "regenerate-system-contracts-artifacts": "ts-node src/updatePredeployedContracts",
     "test": "NODE_ENV=test hardhat test"
   }
 }
