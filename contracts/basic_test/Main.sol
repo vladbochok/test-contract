@@ -6,7 +6,7 @@ import "./Helper.sol";
 import "./HeapLibrary.sol";
 import "./ConstructorReentrantContract.sol";
 
-address constant addressForBurning = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+address payable constant addressForBurning = payable(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
 
 /// @author Matter Labs
 contract Main {
@@ -70,8 +70,7 @@ contract Main {
         // Test a couple of ercecover calls.
         ecrecoverTest();
 
-        (bool s, ) = addressForBurning.call{value: msg.value}("");
-        require(s, "failed transfer call");
+        addressForBurning.transfer(msg.value);
 
         try this.returnMemory{gas: gasleft()/10000}(0, type(uint32).max) {
             revert("return memory test should failed");
