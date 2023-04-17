@@ -22,7 +22,7 @@ const zkSyncTestnet =
 export default {
     defaultNetwork:  "zkSyncTestnet",
     zksolc: {
-        version: '1.3.1',
+        version: '1.3.5',
         compilerSource: 'binary',
         settings: {
             optimizer: {
